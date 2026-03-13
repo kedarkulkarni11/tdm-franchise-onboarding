@@ -21,8 +21,23 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-tdm-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+      <section className="relative text-white overflow-hidden">
+        {/* Background Video */}
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="https://www.thedetailingmafia.com/assets/images/poster.jpg"
+            className="w-full h-full object-cover"
+          >
+            <source src="https://www.thedetailingmafia.com/assets/video/220-stores-highlight-video.mp4" type="video/mp4" />
+            <source src="https://www.thedetailingmafia.com/assets/video/stores.webm" type="video/webm" />
+          </video>
+          <div className="absolute inset-0 bg-black/70" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-tdm-red/20 border border-tdm-red/40 rounded-full px-4 py-1.5 text-sm text-red-300 mb-6">
               <Award className="w-4 h-4" /> Franchise Division
