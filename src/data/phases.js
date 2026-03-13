@@ -1,0 +1,105 @@
+export const PHASES = [
+  {
+    id: 1,
+    title: 'Lead Capture & Outreach',
+    shortTitle: 'Lead Capture',
+    icon: 'Megaphone',
+    color: '#3B82F6',
+    steps: [
+      { id: 1, title: 'Campaign Live', description: 'Google Ads & Meta Ads campaigns targeting aspiring entrepreneurs.', owner: 'Marketing' },
+      { id: 2, title: 'Lead Captured', description: 'Enquiry form submitted. CRM captures Name, City, Contact, Source.', owner: 'CRM' },
+      { id: 3, title: 'RSM Call — Same Day', description: 'RSM calls within same business day. Introduction, interest check, qualifier questions.', owner: 'RSM' },
+      { id: 4, title: 'WhatsApp Follow-Up', description: 'If no answer: WhatsApp template within 1 hour. Follow up at T+24hrs. 3 attempts over 3 days.', owner: 'RSM' },
+    ],
+  },
+  {
+    id: 2,
+    title: 'Qualification & Interest',
+    shortTitle: 'Qualification',
+    icon: 'ClipboardCheck',
+    color: '#8B5CF6',
+    steps: [
+      { id: 5, title: 'Franchise Evaluation Form Sent', description: 'Official evaluation form shared post-call. Deadline: 48 hours to submit.', owner: 'RSM' },
+      { id: 6, title: 'Form Evaluated by GM & RSM', description: 'Joint review: financial eligibility, business background, city viability, commitment level.', owner: 'GM + RSM' },
+      { id: 7, title: 'Video Call — ROI Discussion', description: 'Brand story, opportunity overview, Black Book ROI discussion, financial readiness gauge.', owner: 'GM + RSM' },
+      { id: 8, title: 'HO Visit Invitation', description: 'Formal invite to Head Office for corporate presentation, ROI discussion, CEO meeting.', owner: 'RSM' },
+    ],
+  },
+  {
+    id: 3,
+    title: 'Due Diligence & Verification',
+    shortTitle: 'Due Diligence',
+    icon: 'ShieldCheck',
+    color: '#F59E0B',
+    steps: [
+      { id: 9, title: 'HO Tour & Experience Centre', description: 'Office tour, brand immersion, experience centre walkthrough, meet leadership team.', owner: 'GM' },
+      { id: 10, title: 'Corporate Presentation & Token', description: 'Brand DNA, market opportunity, franchise model, revenue projections. Franchise token closed.', owner: 'GM' },
+      { id: 11, title: 'MOU Signed & Verification', description: 'Independent verification by second GM: background check, financial reconfirmation, references.', owner: 'Second GM' },
+      { id: 12, title: 'Site Finalization (60-90 Days)', description: 'Prospect identifies store location. RSM assists with site visits, layout standards, approvals.', owner: 'RSM + HO' },
+    ],
+  },
+  {
+    id: 4,
+    title: 'Agreement & Store Setup',
+    shortTitle: 'Agreement',
+    icon: 'FileSignature',
+    color: '#EF4444',
+    steps: [
+      { id: 13, title: 'Landlord Agreement + Fees Closed', description: 'Landlord agreement signed. 100% Franchise Fee and Architecture Fee closed.', owner: 'Franchisee' },
+      { id: 14, title: 'Architect Work Initiated', description: 'HO-approved architect begins layout planning. Store design follows TDM brand guidelines.', owner: 'HO Team' },
+      { id: 15, title: 'Legal Agreement Signed', description: 'Signed at HO with 2 witnesses from each side. Territory rights, royalty structure, brand usage.', owner: 'GM + Legal' },
+      { id: 16, title: 'Construction & M&P Payment', description: 'Construction: 60-90 days. Machinery & Products payment due 45 days before dispatch.', owner: 'Franchisee' },
+    ],
+  },
+  {
+    id: 5,
+    title: 'Onboarding & Training',
+    shortTitle: 'Onboarding',
+    icon: 'GraduationCap',
+    color: '#10B981',
+    steps: [
+      { id: 17, title: 'PDC Submission & Site Visit', description: '60 Post-Dated Cheques submitted. Under-construction site visit. Training team deployed.', owner: 'Franchisee + HO' },
+      { id: 18, title: 'Store Design & Setup', description: 'HO design team finalises layout. Branding, signage, service bay planning per TDM guidelines.', owner: 'HO Design' },
+      { id: 19, title: 'Machinery & Procurement', description: 'Approved machinery list shared. Product procurement checklist. HO support for bulk ordering.', owner: 'HO + Franchisee' },
+      { id: 20, title: 'Manpower Hiring', description: 'Hiring guides & JD templates shared. RSM assists screening. Minimum staff defined.', owner: 'RSM + Franchisee' },
+      { id: 21, title: 'Pre-Training Compliance', description: 'All compliance docs: GST registration, Shop Act, local permits, ID verification complete.', owner: 'Franchisee' },
+      { id: 22, title: '10-Day Training Program', description: 'Machine installation, PPF training, paint booth training. 60 PDCs required before start.', owner: 'Training Team' },
+    ],
+  },
+  {
+    id: 6,
+    title: 'Launch & Scale',
+    shortTitle: 'Launch',
+    icon: 'Rocket',
+    color: '#EC4899',
+    steps: [
+      { id: 23, title: 'Pre-Launch Marketing', description: 'Social media campaigns, Google My Business, local PR, pre-launch offers, WhatsApp broadcast.', owner: 'Marketing' },
+      { id: 24, title: 'Inauguration & Go-Live', description: 'Grand opening event. RSM & GM present. Influencer invites, media coverage, first-day operations.', owner: 'RSM + GM' },
+      { id: 25, title: 'Post-Launch Support', description: 'Weekly performance review (first 60 days), HO audit, revenue tracking, customer feedback loops.', owner: 'OPS Team' },
+      { id: 26, title: 'Scale & Expansion', description: 'Multi-unit eligibility after 6 months. Performance thresholds, new territory rights, annual summit.', owner: 'GM + CEO' },
+    ],
+  },
+];
+
+export const FORM_FIELDS = {
+  personal: [
+    { name: 'fullName', label: 'Full Name', type: 'text', required: true, placeholder: 'Enter your full name' },
+    { name: 'email', label: 'Email Address', type: 'email', required: true, placeholder: 'you@example.com' },
+    { name: 'phone', label: 'Phone Number', type: 'tel', required: true, placeholder: '+91 XXXXX XXXXX' },
+    { name: 'city', label: 'City', type: 'text', required: true, placeholder: 'Your city' },
+    { name: 'state', label: 'State', type: 'text', required: true, placeholder: 'Your state' },
+  ],
+  business: [
+    { name: 'occupation', label: 'Current Occupation', type: 'text', required: true, placeholder: 'e.g., Business Owner, Professional' },
+    { name: 'businessExperience', label: 'Business Experience', type: 'select', required: true, options: ['No prior experience', '1-3 years', '3-5 years', '5-10 years', '10+ years'] },
+    { name: 'investmentCapacity', label: 'Investment Capacity (INR)', type: 'select', required: true, options: ['Below 25 Lakhs', '25-50 Lakhs', '50 Lakhs - 1 Crore', '1-2 Crore', 'Above 2 Crore'] },
+    { name: 'preferredLocation', label: 'Preferred Franchise Location', type: 'text', required: true, placeholder: 'City/Area for the franchise' },
+    { name: 'ownedProperty', label: 'Do you own commercial property?', type: 'select', required: true, options: ['Yes - ready to use', 'Yes - needs renovation', 'No - will lease', 'Exploring options'] },
+  ],
+  intent: [
+    { name: 'unitsPlanned', label: 'Number of Units Planned', type: 'select', required: true, options: ['Single unit', '2-3 units', '4-5 units', 'Master franchise'] },
+    { name: 'timeline', label: 'Timeline to Launch', type: 'select', required: true, options: ['Immediately (1-2 months)', '3-6 months', '6-12 months', 'Just exploring'] },
+    { name: 'hearAbout', label: 'How did you hear about us?', type: 'select', required: true, options: ['Google Ads', 'Facebook/Instagram', 'YouTube', 'Referral', 'Website', 'Other'] },
+    { name: 'message', label: 'Additional Message (Optional)', type: 'textarea', required: false, placeholder: 'Tell us about your vision...' },
+  ],
+};

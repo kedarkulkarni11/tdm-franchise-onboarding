@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-tdm-red: #B91C1C;
+  --color-tdm-dark: #111827;
+  --color-tdm-gold: #D4A843;
+  --color-tdm-gray: #374151;
+  --color-tdm-light: #F9FAFB;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
