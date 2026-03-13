@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'tdm_franchise_applications';
+const MAX_FILE_SIZE = 500 * 1024; // 500KB per file
 
 function generateId() {
   return 'TDM-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -31,9 +32,11 @@ export function useApplications() {
       status: 'active',
       submittedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      comments: [],
+      attachments: [],
       activityLog: [
-        { step: 1, title: 'Campaign Live', completedAt: new Date(Date.now() - 86400000).toISOString(), note: 'Lead generated via ad campaign' },
-        { step: 2, title: 'Lead Captured', completedAt: new Date().toISOString(), note: 'Application form submitted successfully' },
+        { step: 1, title: 'Campaign Live', completedAt: new Date(Date.now() - 86400000).toISOString(), note: 'Lead generated via ad campaign', type: 'step_complete' },
+        { step: 2, title: 'Lead Captured', completedAt: new Date().toISOString(), note: 'Application form submitted successfully', type: 'step_complete' },
       ],
     };
     const updated = [...applications, app];
@@ -81,8 +84,72 @@ export function useApplications() {
         status: completingStep >= 26 ? 'completed' : 'active',
         activityLog: [
           ...app.activityLog,
-          { step: completingStep, title: stepTitles[completingStep] || `Step ${completingStep}`, completedAt: new Date().toISOString(), note: 'Marked complete' },
+          { step: completingStep, title: stepTitles[completingStep] || `Step ${completingStep}`, completedAt: new Date().toISOString(), note: 'Marked complete', type: 'step_complete' },
         ],
+      };
+    });
+    save(updated);
+  };
+
+  const addComment = (appId, stepId, author, text) => {
+    const updated = applications.map(app => {
+      if (app.id !== appId) return app;
+      const comment = {
+        id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+        stepId,
+        author,
+        text,
+        createdAt: new Date().toISOString(),
+      };
+      return {
+        ...app,
+        updatedAt: new Date().toISOString(),
+        comments: [...(app.comments || []), comment],
+        activityLog: [
+          ...(app.activityLog || []),
+          { step: stepId, title: `Comment by ${author === 'admin' ? 'Admin' : 'Applicant'}`, completedAt: new Date().toISOString(), note: text, type: 'comment', author },
+        ],
+      };
+    });
+    save(updated);
+  };
+
+  const addAttachment = (appId, stepId, fileName, fileType, fileSize, dataUrl) => {
+    if (fileSize > MAX_FILE_SIZE) {
+      return { error: `File exceeds ${MAX_FILE_SIZE / 1024}KB limit` };
+    }
+    const updated = applications.map(app => {
+      if (app.id !== appId) return app;
+      const attachment = {
+        id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+        stepId,
+        fileName,
+        fileType,
+        fileSize,
+        dataUrl,
+        uploadedAt: new Date().toISOString(),
+      };
+      return {
+        ...app,
+        updatedAt: new Date().toISOString(),
+        attachments: [...(app.attachments || []), attachment],
+        activityLog: [
+          ...(app.activityLog || []),
+          { step: stepId, title: 'File Attached', completedAt: new Date().toISOString(), note: fileName, type: 'attachment' },
+        ],
+      };
+    });
+    save(updated);
+    return { success: true };
+  };
+
+  const removeAttachment = (appId, attachmentId) => {
+    const updated = applications.map(app => {
+      if (app.id !== appId) return app;
+      return {
+        ...app,
+        updatedAt: new Date().toISOString(),
+        attachments: (app.attachments || []).filter(a => a.id !== attachmentId),
       };
     });
     save(updated);
@@ -92,5 +159,5 @@ export function useApplications() {
     save(applications.filter(a => a.id !== id));
   };
 
-  return { applications, submitApplication, getApplication, advanceStep, deleteApplication };
+  return { applications, submitApplication, getApplication, advanceStep, deleteApplication, addComment, addAttachment, removeAttachment };
 }

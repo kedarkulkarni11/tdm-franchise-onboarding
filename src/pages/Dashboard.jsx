@@ -2,11 +2,13 @@ import { useParams, Link } from 'react-router-dom';
 import { PHASES } from '../data/phases';
 import PhaseTracker from '../components/PhaseTracker';
 import StepCard from '../components/StepCard';
-import { Clock, MapPin, Phone, Mail, Building, Calendar, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import AIInsightsCard from '../components/AIInsightsCard';
+import { Clock, MapPin, Phone, Mail, Building, ArrowLeft, CheckCircle2, MessageSquare, Paperclip } from 'lucide-react';
 
-export default function Dashboard({ getApplication, advanceStep }) {
+export default function Dashboard({ getApplication, advanceStep, addComment, addAttachment, removeAttachment, sendStepUpdateEmail }) {
   const { id } = useParams();
   const app = getApplication(id);
+  const isAdmin = sessionStorage.getItem('tdm_admin_auth') === 'true';
 
   if (!app) {
     return (
@@ -26,6 +28,31 @@ export default function Dashboard({ getApplication, advanceStep }) {
   const totalSteps = 26;
   const progress = Math.round((app.completedSteps.length / totalSteps) * 100);
   const currentPhaseData = PHASES.find(p => p.id === app.currentPhase);
+  const author = isAdmin ? 'admin' : 'applicant';
+
+  const handleAdvance = (sendEmail) => {
+    const completingStep = app.currentStep;
+    advanceStep(app.id);
+    if (sendEmail && sendStepUpdateEmail) {
+      const stepTitles = {
+        3: 'RSM Call — Same Day', 4: 'WhatsApp Follow-Up',
+        5: 'Evaluation Form Sent', 6: 'Form Evaluated', 7: 'Video Call', 8: 'HO Visit Invitation',
+        9: 'HO Tour', 10: 'Corporate Presentation', 11: 'MOU & Verification', 12: 'Site Finalization',
+        13: 'Fees Closed', 14: 'Architect Work', 15: 'Legal Agreement', 16: 'Construction Started',
+        17: 'PDC Submission', 18: 'Store Setup', 19: 'Machinery Procurement', 20: 'Manpower Hiring',
+        21: 'Pre-Training Compliance', 22: 'Training Complete',
+        23: 'Pre-Launch Marketing', 24: 'Inauguration', 25: 'Post-Launch Support', 26: 'Scale & Expansion',
+      };
+      sendStepUpdateEmail(app.email, app.fullName, app.id, stepTitles[completingStep] || `Step ${completingStep}`, completingStep, totalSteps);
+    }
+  };
+
+  const getTimelineIcon = (entry) => {
+    const type = entry.type || 'step_complete';
+    if (type === 'comment') return <MessageSquare className="w-4 h-4 text-blue-500" />;
+    if (type === 'attachment') return <Paperclip className="w-4 h-4 text-purple-500" />;
+    return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -36,6 +63,9 @@ export default function Dashboard({ getApplication, advanceStep }) {
             <ArrowLeft className="w-4 h-4" /> Back to Tracker
           </Link>
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-purple-700">Admin View</span>
+            )}
             <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
               app.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
             }`}>
@@ -78,7 +108,7 @@ export default function Dashboard({ getApplication, advanceStep }) {
           <PhaseTracker currentPhase={app.currentPhase} currentStep={app.currentStep} completedSteps={app.completedSteps} />
         </div>
 
-        {/* Current Phase Steps */}
+        {/* Current Phase Steps + Sidebar */}
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -89,10 +119,7 @@ export default function Dashboard({ getApplication, advanceStep }) {
             {PHASES.map(phase => (
               <div key={phase.id}>
                 {phase.id !== app.currentPhase && (
-                  <button
-                    onClick={() => {}}
-                    className="w-full text-left mb-2"
-                  />
+                  <button onClick={() => {}} className="w-full text-left mb-2" />
                 )}
                 {(phase.id === app.currentPhase || phase.steps.some(s => app.completedSteps.includes(s.id))) && (
                   <div className={phase.id !== app.currentPhase ? 'opacity-70' : ''}>
@@ -102,17 +129,27 @@ export default function Dashboard({ getApplication, advanceStep }) {
                       </h4>
                     )}
                     <div className="space-y-3">
-                      {phase.steps.map(step => (
-                        <StepCard
-                          key={step.id}
-                          step={step}
-                          phaseColor={phase.color}
-                          isCompleted={app.completedSteps.includes(step.id)}
-                          isCurrent={step.id === app.currentStep}
-                          isLocked={step.id > app.currentStep}
-                          onAdvance={step.id === app.currentStep ? () => advanceStep(app.id) : null}
-                        />
-                      ))}
+                      {phase.steps.map(step => {
+                        const stepComments = (app.comments || []).filter(c => c.stepId === step.id);
+                        const stepAttachments = (app.attachments || []).filter(a => a.stepId === step.id);
+                        return (
+                          <StepCard
+                            key={step.id}
+                            step={step}
+                            phaseColor={phase.color}
+                            isCompleted={app.completedSteps.includes(step.id)}
+                            isCurrent={step.id === app.currentStep}
+                            isLocked={step.id > app.currentStep}
+                            onAdvance={step.id === app.currentStep ? handleAdvance : null}
+                            comments={stepComments}
+                            attachments={stepAttachments}
+                            onAddComment={(text) => addComment(app.id, step.id, author, text)}
+                            onAddAttachment={(fileName, fileType, fileSize, dataUrl) => addAttachment(app.id, step.id, fileName, fileType, fileSize, dataUrl)}
+                            onRemoveAttachment={(attId) => removeAttachment(app.id, attId)}
+                            isAdmin={isAdmin}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -120,17 +157,21 @@ export default function Dashboard({ getApplication, advanceStep }) {
             ))}
           </div>
 
-          {/* Timeline Sidebar */}
-          <div>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* AI Insights (admin only) */}
+            {isAdmin && <AIInsightsCard application={app} />}
+
+            {/* Activity Timeline */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-tdm-red" /> Activity Timeline
               </h3>
-              <div className="space-y-4">
-                {[...app.activityLog].reverse().map((entry, i) => (
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {[...(app.activityLog || [])].reverse().map((entry, i) => (
                   <div key={i} className="flex gap-3">
                     <div className="mt-1">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      {getTimelineIcon(entry)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900">{entry.title}</div>

@@ -65,3 +65,23 @@ What happens next:
 
   return { subject, htmlBody, textBody, trackingUrl };
 }
+
+export function buildStepUpdateEmail(recipientEmail, recipientName, appId, stepTitle, stepNum, totalSteps) {
+  const trackingUrl = `${window.location.origin}${window.location.pathname}#/dashboard/${appId}`;
+  const progress = Math.round((stepNum / totalSteps) * 100);
+
+  const subject = `TDM Franchise — Step Completed: ${stepTitle} (${appId})`;
+
+  const textBody = `Hi ${recipientName},
+
+Your franchise application (${appId}) has been updated.
+
+Step Completed: ${stepTitle} (Step ${stepNum} of ${totalSteps})
+Overall Progress: ${progress}%
+
+Track your application: ${trackingUrl}
+
+— The Detailing Mafia Franchise Division`;
+
+  return { subject, textBody, trackingUrl };
+}
