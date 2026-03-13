@@ -1,8 +1,97 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PHASES } from '../data/phases';
-import { Users, TrendingUp, Clock, CheckCircle, Trash2, ExternalLink } from 'lucide-react';
+import { Users, TrendingUp, Clock, CheckCircle, Trash2, ExternalLink, Lock, LogOut } from 'lucide-react';
+
+const ADMIN_CREDENTIALS = { username: 'admin', password: 'tdm@2024' };
+
+function LoginGate({ onLogin }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+      onLogin();
+    } else {
+      setError('Invalid credentials. Please try again.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-tdm-red/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-tdm-red" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">Admin Access</h2>
+          <p className="text-gray-500 text-sm mt-1">Enter your credentials to access the admin panel</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={e => { setUsername(e.target.value); setError(''); }}
+              placeholder="Enter username"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-tdm-red/20 focus:border-tdm-red transition-colors"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => { setPassword(e.target.value); setError(''); }}
+              placeholder="Enter password"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-tdm-red/20 focus:border-tdm-red transition-colors"
+            />
+          </div>
+
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-tdm-red text-white font-semibold rounded-xl hover:bg-red-800 transition-colors cursor-pointer"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <p className="text-xs text-gray-400 text-center mt-6">For internal use — Sales Team only</p>
+      </div>
+    </div>
+  );
+}
 
 export default function Admin({ applications, deleteApplication }) {
+  const [authenticated, setAuthenticated] = useState(() => {
+    return sessionStorage.getItem('tdm_admin_auth') === 'true';
+  });
+
+  const handleLogin = () => {
+    sessionStorage.setItem('tdm_admin_auth', 'true');
+    setAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('tdm_admin_auth');
+    setAuthenticated(false);
+  };
+
+  if (!authenticated) {
+    return <LoginGate onLogin={handleLogin} />;
+  }
+
   const active = applications.filter(a => a.status === 'active').length;
   const completed = applications.filter(a => a.status === 'completed').length;
 
@@ -19,6 +108,12 @@ export default function Admin({ applications, deleteApplication }) {
             <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-gray-500 text-sm">Franchise Sales Pipeline Overview</p>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-tdm-red border border-gray-200 rounded-lg hover:border-tdm-red transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
         </div>
 
         {/* Stats */}

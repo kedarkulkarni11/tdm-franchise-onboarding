@@ -1,90 +1,82 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowRight, FileText } from 'lucide-react';
+import { Search, ArrowRight, FileSearch, AlertCircle } from 'lucide-react';
 
 export default function Track({ applications }) {
   const navigate = useNavigate();
   const [searchId, setSearchId] = useState('');
+  const [error, setError] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchId.trim()) {
-      navigate(`/dashboard/${searchId.trim()}`);
+    const id = searchId.trim();
+    if (!id) {
+      setError('Please enter your application ID.');
+      return;
+    }
+    const found = applications.find(a => a.id === id);
+    if (found) {
+      navigate(`/dashboard/${id}`);
+    } else {
+      setError('No application found with this ID. Please check and try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
         <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-tdm-red/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <FileSearch className="w-8 h-8 text-tdm-red" />
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Track Your Application</h1>
-          <p className="text-gray-500">Enter your application ID or select from recent applications below.</p>
+          <p className="text-gray-500">Enter the application ID you received after submitting your franchise inquiry.</p>
         </div>
 
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex gap-3 mb-10">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchId}
-              onChange={e => setSearchId(e.target.value)}
-              placeholder="Enter Application ID (e.g., TDM-XXXXX)"
-              className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-tdm-red transition-colors"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-6 py-3.5 bg-tdm-red text-white font-semibold rounded-xl hover:bg-red-800 transition-colors cursor-pointer"
-          >
-            Track
-          </button>
-        </form>
-
-        {/* Recent Applications */}
-        {applications.length > 0 ? (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Recent Applications</h3>
-            <div className="space-y-3">
-              {applications.map(app => {
-                const progress = Math.round((app.completedSteps.length / 26) * 100);
-                return (
-                  <Link
-                    key={app.id}
-                    to={`/dashboard/${app.id}`}
-                    className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow no-underline group"
-                  >
-                    <div className="w-12 h-12 bg-tdm-red/10 rounded-xl flex items-center justify-center shrink-0">
-                      <FileText className="w-6 h-6 text-tdm-red" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-900">{app.fullName}</span>
-                        <code className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-mono">{app.id}</code>
-                      </div>
-                      <div className="text-sm text-gray-500 mt-0.5">
-                        {app.city} | Phase {app.currentPhase} | {progress}% complete
-                      </div>
-                      <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-tdm-red rounded-full" style={{ width: `${progress}%` }} />
-                      </div>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-tdm-red transition-colors shrink-0" />
-                  </Link>
-                );
-              })}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+          <form onSubmit={handleSearch} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Application ID</label>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchId}
+                  onChange={e => { setSearchId(e.target.value); setError(''); }}
+                  placeholder="e.g., TDM-XXXXX-XXXX"
+                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-tdm-red/20 focus:border-tdm-red transition-colors ${
+                    error ? 'border-red-400' : 'border-gray-200'
+                  }`}
+                  autoFocus
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No Applications Yet</h3>
-            <p className="text-gray-500 mb-4">Submit a franchise inquiry to get started.</p>
-            <Link to="/apply" className="inline-flex items-center gap-2 bg-tdm-red text-white px-6 py-2.5 rounded-xl font-semibold no-underline hover:bg-red-800">
-              Apply Now <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        )}
+
+            {error && (
+              <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-tdm-red text-white font-semibold rounded-xl hover:bg-red-800 transition-colors cursor-pointer flex items-center justify-center gap-2"
+            >
+              Track Application <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-500 mb-3">Don't have an application yet?</p>
+          <Link
+            to="/apply"
+            className="inline-flex items-center gap-2 text-tdm-red font-semibold hover:underline no-underline"
+          >
+            Apply for a Franchise <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </div>
   );
