@@ -1,0 +1,115 @@
+{
+  "applications": [
+    {
+      "id": "TDM-DEMO-001",
+      "fullName": "Rahul Sharma",
+      "email": "rahul@example.com",
+      "phone": "+91 9876543210",
+      "country": "India (+91)",
+      "countryName": "India",
+      "state": "Maharashtra",
+      "city": "Mumbai",
+      "preferredLocation": "Andheri West, Mumbai",
+      "occupation": "Business Owner",
+      "businessExperience": "5-10 years",
+      "investmentCapacity": "50 Lakhs - 1 Crore",
+      "ownedProperty": "Yes - ready to use",
+      "unitsPlanned": "2-3 units",
+      "timeline": "Immediately (1-2 months)",
+      "source": "Google Ads",
+      "currentPhase": 2,
+      "currentStep": 7,
+      "completedSteps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "status": "active",
+      "submittedAt": "2026-03-01T10:00:00.000Z",
+      "updatedAt": "2026-03-13T09:03:07.186Z",
+      "comments": [
+        {
+          "id": "c1",
+          "stepId": 3,
+          "author": "admin",
+          "text": "RSM call completed. Applicant is very enthusiastic about the franchise.",
+          "visibility": "shared",
+          "createdAt": "2026-03-02T11:00:00.000Z"
+        },
+        {
+          "id": "c2",
+          "stepId": 5,
+          "author": "admin",
+          "text": "Evaluation form sent via email. Awaiting response.",
+          "visibility": "shared",
+          "createdAt": "2026-03-05T09:00:00.000Z"
+        },
+        {
+          "id": "c3",
+          "stepId": 5,
+          "author": "admin",
+          "text": "Internal: Credit check shows good financial standing.",
+          "visibility": "internal",
+          "createdAt": "2026-03-05T10:00:00.000Z"
+        }
+      ],
+      "attachments": [],
+      "activityLog": [
+        {
+          "step": 1,
+          "title": "Campaign Live",
+          "completedAt": "2026-03-01T08:00:00.000Z",
+          "note": "Lead generated via Google Ads",
+          "type": "step_complete"
+        },
+        {
+          "step": 2,
+          "title": "Lead Captured",
+          "completedAt": "2026-03-01T10:00:00.000Z",
+          "note": "Application form submitted",
+          "type": "step_complete"
+        },
+        {
+          "step": 3,
+          "title": "RSM Call — Same Day",
+          "completedAt": "2026-03-02T11:00:00.000Z",
+          "note": "Marked complete",
+          "type": "step_complete"
+        },
+        {
+          "step": 3,
+          "title": "Comment by Admin",
+          "completedAt": "2026-03-02T11:00:00.000Z",
+          "note": "RSM call completed. Applicant is very enthusiastic about the franchise.",
+          "type": "comment",
+          "author": "admin",
+          "visibility": "shared"
+        },
+        {
+          "step": 4,
+          "title": "WhatsApp Follow-Up",
+          "completedAt": "2026-03-03T09:00:00.000Z",
+          "note": "Marked complete",
+          "type": "step_complete"
+        },
+        {
+          "step": 5,
+          "title": "Evaluation Form Sent",
+          "completedAt": "2026-03-05T09:00:00.000Z",
+          "note": "Marked complete",
+          "type": "step_complete"
+        },
+        {
+          "step": 6,
+          "title": "Form Evaluated",
+          "completedAt": "2026-03-13T09:03:07.189Z",
+          "note": "Marked complete",
+          "type": "step_complete"
+        }
+      ]
+    }
+  ]
+}

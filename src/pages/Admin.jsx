@@ -118,6 +118,7 @@ export default function Admin({ applications, deleteApplication }) {
 
   const active = filteredApplications.filter(a => a.status === 'active').length;
   const completed = filteredApplications.filter(a => a.status === 'completed').length;
+  const rejected = filteredApplications.filter(a => a.status === 'rejected').length;
 
   const phaseDistribution = PHASES.map(p => ({
     ...p,
@@ -143,11 +144,12 @@ export default function Admin({ applications, deleteApplication }) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
             { icon: Users, label: 'Total Leads', value: filteredApplications.length, color: 'bg-blue-500' },
             { icon: TrendingUp, label: 'Active', value: active, color: 'bg-green-500' },
             { icon: CheckCircle, label: 'Completed', value: completed, color: 'bg-purple-500' },
+            { icon: Users, label: 'Rejected', value: rejected, color: 'bg-red-500' },
             { icon: Clock, label: 'Avg Phase', value: filteredApplications.length ? Math.round(filteredApplications.reduce((s, a) => s + a.currentPhase, 0) / filteredApplications.length * 10) / 10 : 0, color: 'bg-orange-500' },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-5">
@@ -196,6 +198,7 @@ export default function Admin({ applications, deleteApplication }) {
               <option value="">All Status</option>
               <option value="active">Active</option>
               <option value="completed">Completed</option>
+              <option value="rejected">Rejected</option>
             </select>
             <select value={filters.state} onChange={e => setFilters(f => ({ ...f, state: e.target.value }))} className={selectClass}>
               <option value="">All States</option>
@@ -265,9 +268,11 @@ export default function Admin({ applications, deleteApplication }) {
                         <td className="px-6 py-4 text-xs text-gray-600">{app.investmentCapacity}</td>
                         <td className="px-6 py-4">
                           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                            app.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                            app.status === 'completed' ? 'bg-green-100 text-green-700'
+                            : app.status === 'rejected' ? 'bg-red-100 text-red-700'
+                            : 'bg-blue-100 text-blue-700'
                           }`}>
-                            {app.status === 'completed' ? 'Complete' : 'Active'}
+                            {app.status === 'completed' ? 'Complete' : app.status === 'rejected' ? 'Rejected' : 'Active'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">

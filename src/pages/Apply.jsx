@@ -26,7 +26,7 @@ function SuccessScreen({ appId, email, fullName }) {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
         <p className="text-gray-500 mb-6">
-          Thank you, {fullName}. Your franchise application has been received. A confirmation email has been sent to <strong>{email}</strong>.
+          Thank you, {fullName}. Your franchise application has been received. Use the tracking ID below to check your application status.
         </p>
 
         <div className="bg-gray-50 rounded-xl p-4 mb-6">
@@ -57,7 +57,7 @@ function SuccessScreen({ appId, email, fullName }) {
   );
 }
 
-export default function Apply({ onSubmit, sendNotificationEmail }) {
+export default function Apply({ onSubmit }) {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({ country: 'IN', phoneCode: '+91' });
   const [errors, setErrors] = useState({});
@@ -109,14 +109,6 @@ export default function Apply({ onSubmit, sendNotificationEmail }) {
       const submission = { ...formData, phone: fullPhone, countryName };
       delete submission.phoneCode;
       const appId = onSubmit(submission);
-
-      if (sendNotificationEmail) {
-        try {
-          await sendNotificationEmail(formData.email, formData.fullName, appId);
-        } catch (e) {
-          console.warn('Email notification failed:', e);
-        }
-      }
 
       setSubmitted({ appId, email: formData.email, fullName: formData.fullName });
     }

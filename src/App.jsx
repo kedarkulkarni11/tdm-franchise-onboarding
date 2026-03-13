@@ -6,17 +6,11 @@ import Track from './pages/Track';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import { useApplications } from './hooks/useApplications';
-import { buildNotificationEmail, buildStepUpdateEmail } from './utils/sendEmail';
+import { buildStepUpdateEmail } from './utils/sendEmail';
 import './index.css';
 
 function App() {
-  const { applications, submitApplication, getApplication, advanceStep, deleteApplication, addComment, addAttachment, removeAttachment } = useApplications();
-
-  const sendNotificationEmail = async (email, fullName, appId) => {
-    const { subject, textBody } = buildNotificationEmail(email, fullName, appId);
-    const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
-    window.open(mailtoUrl, '_blank');
-  };
+  const { applications, submitApplication, getApplication, advanceStep, rejectApplication, deleteApplication, addComment, addAttachment, removeAttachment } = useApplications();
 
   const sendStepUpdateEmail = (email, fullName, appId, stepTitle, stepNum, totalSteps) => {
     const { subject, textBody } = buildStepUpdateEmail(email, fullName, appId, stepTitle, stepNum, totalSteps);
@@ -30,12 +24,13 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/apply" element={<Apply onSubmit={submitApplication} sendNotificationEmail={sendNotificationEmail} />} />
+          <Route path="/apply" element={<Apply onSubmit={submitApplication} />} />
           <Route path="/track" element={<Track applications={applications} />} />
           <Route path="/dashboard/:id" element={
             <Dashboard
               getApplication={getApplication}
               advanceStep={advanceStep}
+              rejectApplication={rejectApplication}
               addComment={addComment}
               addAttachment={addAttachment}
               removeAttachment={removeAttachment}

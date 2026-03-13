@@ -3,9 +3,9 @@ import { PHASES } from '../data/phases';
 import PhaseTracker from '../components/PhaseTracker';
 import StepCard from '../components/StepCard';
 import AIInsightsCard from '../components/AIInsightsCard';
-import { Clock, MapPin, Phone, Mail, Building, ArrowLeft, CheckCircle2, MessageSquare, Paperclip } from 'lucide-react';
+import { Clock, MapPin, Phone, Mail, Building, ArrowLeft, CheckCircle2, MessageSquare, Paperclip, XCircle, EyeOff } from 'lucide-react';
 
-export default function Dashboard({ getApplication, advanceStep, addComment, addAttachment, removeAttachment, sendStepUpdateEmail }) {
+export default function Dashboard({ getApplication, advanceStep, rejectApplication, addComment, addAttachment, removeAttachment, sendStepUpdateEmail }) {
   const { id } = useParams();
   const app = getApplication(id);
   const isAdmin = sessionStorage.getItem('tdm_admin_auth') === 'true';
@@ -49,10 +49,16 @@ export default function Dashboard({ getApplication, advanceStep, addComment, add
 
   const getTimelineIcon = (entry) => {
     const type = entry.type || 'step_complete';
+    if (type === 'rejection') return <XCircle className="w-4 h-4 text-red-500" />;
     if (type === 'comment') return <MessageSquare className="w-4 h-4 text-blue-500" />;
     if (type === 'attachment') return <Paperclip className="w-4 h-4 text-purple-500" />;
     return <CheckCircle2 className="w-4 h-4 text-green-500" />;
   };
+
+  // Filter activity log: non-admin should not see internal comments
+  const visibleActivityLog = isAdmin
+    ? (app.activityLog || [])
+    : (app.activityLog || []).filter(e => e.visibility !== 'internal');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,9 +73,11 @@ export default function Dashboard({ getApplication, advanceStep, addComment, add
               <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-100 text-purple-700">Admin View</span>
             )}
             <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-              app.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+              app.status === 'completed' ? 'bg-green-100 text-green-700'
+              : app.status === 'rejected' ? 'bg-red-100 text-red-700'
+              : 'bg-blue-100 text-blue-700'
             }`}>
-              {app.status === 'completed' ? 'Onboarding Complete' : 'In Progress'}
+              {app.status === 'completed' ? 'Onboarding Complete' : app.status === 'rejected' ? 'Rejected' : 'In Progress'}
             </span>
             <code className="text-sm bg-gray-100 px-3 py-1 rounded-lg text-gray-600 font-mono">{app.id}</code>
           </div>
@@ -101,6 +109,22 @@ export default function Dashboard({ getApplication, advanceStep, addComment, add
             <div className="h-full bg-gradient-to-r from-tdm-red to-red-400 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
         </div>
+
+        {/* Rejection Banner */}
+        {app.status === 'rejected' && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 mb-6">
+            <div className="flex items-start gap-3">
+              <XCircle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-bold text-red-800">Application Rejected</div>
+                <p className="text-sm text-red-700 mt-1">{app.rejectionReason}</p>
+                <div className="text-xs text-red-400 mt-2">
+                  {new Date(app.rejectedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Phase Tracker */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
@@ -140,10 +164,12 @@ export default function Dashboard({ getApplication, advanceStep, addComment, add
                             isCompleted={app.completedSteps.includes(step.id)}
                             isCurrent={step.id === app.currentStep}
                             isLocked={step.id > app.currentStep}
-                            onAdvance={step.id === app.currentStep ? handleAdvance : null}
+                            onAdvance={isAdmin && step.id === app.currentStep ? handleAdvance : null}
+                            onReject={isAdmin && step.id === app.currentStep ? (reason) => rejectApplication(app.id, reason) : null}
+                            appStatus={app.status}
                             comments={stepComments}
                             attachments={stepAttachments}
-                            onAddComment={(text) => addComment(app.id, step.id, author, text)}
+                            onAddComment={(text, visibility) => addComment(app.id, step.id, author, text, visibility)}
                             onAddAttachment={(fileName, fileType, fileSize, dataUrl) => addAttachment(app.id, step.id, fileName, fileType, fileSize, dataUrl)}
                             onRemoveAttachment={(attId) => removeAttachment(app.id, attId)}
                             isAdmin={isAdmin}
@@ -168,13 +194,18 @@ export default function Dashboard({ getApplication, advanceStep, addComment, add
                 <Clock className="w-5 h-5 text-tdm-red" /> Activity Timeline
               </h3>
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {[...(app.activityLog || [])].reverse().map((entry, i) => (
-                  <div key={i} className="flex gap-3">
+                {[...visibleActivityLog].reverse().map((entry, i) => (
+                  <div key={i} className={`flex gap-3 ${entry.type === 'rejection' ? 'bg-red-50 -mx-2 px-2 py-1 rounded-lg' : ''}`}>
                     <div className="mt-1">
                       {getTimelineIcon(entry)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">{entry.title}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-semibold text-gray-900">{entry.title}</div>
+                        {entry.visibility === 'internal' && isAdmin && (
+                          <span className="text-xs text-amber-600 flex items-center gap-0.5"><EyeOff className="w-3 h-3" /></span>
+                        )}
+                      </div>
                       <div className="text-xs text-gray-400">
                         {new Date(entry.completedAt).toLocaleDateString('en-IN', {
                           day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
