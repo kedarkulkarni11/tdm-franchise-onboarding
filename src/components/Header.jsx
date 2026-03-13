@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Car, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Header() {
@@ -18,9 +18,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3 no-underline">
-            <div className="w-10 h-10 bg-tdm-red rounded-lg flex items-center justify-center">
-              <Car className="w-6 h-6 text-white" />
-            </div>
+            <img src="/tdm-logo.webp" alt="The Detailing Mafia" className="h-10 w-auto" />
             <div>
               <div className="text-white font-bold text-lg leading-tight">THE DETAILING MAFIA</div>
               <div className="text-gray-400 text-xs tracking-widest">FRANCHISE DIVISION</div>

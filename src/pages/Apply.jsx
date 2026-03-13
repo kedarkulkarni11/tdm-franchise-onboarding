@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FORM_FIELDS } from '../data/phases';
 import { COUNTRIES, INDIA_STATES } from '../data/locations';
-import { ChevronRight, ChevronLeft, Send, User, Briefcase, Target, CheckCircle, Copy, ExternalLink } from 'lucide-react';
+import { sendApplicationConfirmationEmail } from '../utils/emailService';
+import { ChevronRight, ChevronLeft, Send, User, Briefcase, Target, CheckCircle, Copy, ExternalLink, Mail } from 'lucide-react';
 
 const sections = [
   { key: 'personal', title: 'Personal Details', icon: User, fields: FORM_FIELDS.personal },
@@ -9,7 +10,7 @@ const sections = [
   { key: 'intent', title: 'Franchise Intent', icon: Target, fields: FORM_FIELDS.intent },
 ];
 
-function SuccessScreen({ appId, email, fullName }) {
+function SuccessScreen({ appId, email, fullName, emailSent }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -28,6 +29,13 @@ function SuccessScreen({ appId, email, fullName }) {
         <p className="text-gray-500 mb-6">
           Thank you, {fullName}. Your franchise application has been received. Use the tracking ID below to check your application status.
         </p>
+
+        {emailSent && (
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-sm text-green-700">
+            <Mail className="w-4 h-4 shrink-0" />
+            <span>A confirmation email has been sent to <strong>{email}</strong></span>
+          </div>
+        )}
 
         <div className="bg-gray-50 rounded-xl p-4 mb-6">
           <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Your Application ID</div>
@@ -108,14 +116,29 @@ export default function Apply({ onSubmit }) {
       const countryName = COUNTRIES.find(c => c.code === formData.country)?.name || formData.country;
       const submission = { ...formData, phone: fullPhone, countryName };
       delete submission.phoneCode;
-      const appId = onSubmit(submission);
+      const appId = await onSubmit(submission);
 
-      setSubmitted({ appId, email: formData.email, fullName: formData.fullName });
+      // Send confirmation email (non-blocking — don't hold up the success screen)
+      let emailSent = false;
+      try {
+        const emailResult = await sendApplicationConfirmationEmail({
+          fullName: formData.fullName,
+          email: formData.email,
+          appId,
+          city: formData.city,
+          state: formData.state,
+        });
+        emailSent = emailResult.success;
+      } catch (e) {
+        console.warn('Email send failed:', e);
+      }
+
+      setSubmitted({ appId, email: formData.email, fullName: formData.fullName, emailSent });
     }
   };
 
   if (submitted) {
-    return <SuccessScreen appId={submitted.appId} email={submitted.email} fullName={submitted.fullName} />;
+    return <SuccessScreen appId={submitted.appId} email={submitted.email} fullName={submitted.fullName} emailSent={submitted.emailSent} />;
   }
 
   const renderField = (field) => {
