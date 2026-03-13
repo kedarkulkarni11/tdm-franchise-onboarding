@@ -6,10 +6,17 @@ import Track from './pages/Track';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import { useApplications } from './hooks/useApplications';
+import { buildNotificationEmail } from './utils/sendEmail';
 import './index.css';
 
 function App() {
   const { applications, submitApplication, getApplication, advanceStep, deleteApplication } = useApplications();
+
+  const sendNotificationEmail = async (email, fullName, appId) => {
+    const { subject, textBody } = buildNotificationEmail(email, fullName, appId);
+    const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
+    window.open(mailtoUrl, '_blank');
+  };
 
   return (
     <Router>
@@ -17,7 +24,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/apply" element={<Apply onSubmit={submitApplication} />} />
+          <Route path="/apply" element={<Apply onSubmit={submitApplication} sendNotificationEmail={sendNotificationEmail} />} />
           <Route path="/track" element={<Track applications={applications} />} />
           <Route path="/dashboard/:id" element={<Dashboard getApplication={getApplication} advanceStep={advanceStep} />} />
           <Route path="/admin" element={<Admin applications={applications} deleteApplication={deleteApplication} />} />

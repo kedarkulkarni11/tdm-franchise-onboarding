@@ -85,9 +85,10 @@ export const FORM_FIELDS = {
   personal: [
     { name: 'fullName', label: 'Full Name', type: 'text', required: true, placeholder: 'Enter your full name' },
     { name: 'email', label: 'Email Address', type: 'email', required: true, placeholder: 'you@example.com' },
-    { name: 'phone', label: 'Phone Number', type: 'tel', required: true, placeholder: '+91 XXXXX XXXXX' },
-    { name: 'city', label: 'City', type: 'text', required: true, placeholder: 'Your city' },
-    { name: 'state', label: 'State', type: 'text', required: true, placeholder: 'Your state' },
+    { name: 'country', label: 'Country', type: 'country', required: true },
+    { name: 'phone', label: 'Phone Number', type: 'phone', required: true, placeholder: 'XXXXX XXXXX' },
+    { name: 'state', label: 'State / Region', type: 'state', required: true },
+    { name: 'city', label: 'City', type: 'city', required: true },
   ],
   business: [
     { name: 'occupation', label: 'Current Occupation', type: 'text', required: true, placeholder: 'e.g., Business Owner, Professional' },
